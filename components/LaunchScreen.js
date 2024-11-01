@@ -5,7 +5,7 @@ const LaunchScreen = () => {
 const navigation = useNavigation();
   return (
     <View style={styles.container}>
-      <Image source={require('../images/LaunchScreen.png')} style={{top:100}}/>
+      <Image source={require('../assets/Data/LaunchScreen.png')} style={{top:100}}/>
     </View>
   )
 }
