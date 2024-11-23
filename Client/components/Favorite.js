@@ -1,85 +1,92 @@
-import { StyleSheet, Text, TouchableOpacity, Image, View, ScrollView } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
-const Favorite = ({ route }) => {
-  const navigation = useNavigation();
+const Favorite = () => {
   const [favorites, setFavorites] = useState([]);
+  const navigation = useNavigation();
 
-  useEffect(() => {
-    const loadFavorites = async () => {
+  // Hàm tải dữ liệu yêu thích từ AsyncStorage
+  const loadFavorites = async () => {
+    try {
       const storedFavorites = await AsyncStorage.getItem('favorites');
       if (storedFavorites) {
-        setFavorites(JSON.parse(storedFavorites));
+        setFavorites(JSON.parse(storedFavorites)); // Hiển thị dữ liệu đã lưu
+      } else {
+        setFavorites([]);  // Không có dữ liệu yêu thích
       }
-    };
-    loadFavorites();
-  }, []);
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  };
+
+  // Sử dụng useFocusEffect để tải lại dữ liệu mỗi khi người dùng quay lại trang này
+  useFocusEffect(
+    React.useCallback(() => {
+      loadFavorites();  // Tải lại dữ liệu mỗi khi màn hình được focus
+    }, [])
+  );
+
+  // Hàm để xóa tất cả yêu thích
+  const handleClearFavorites = async () => {
+    try {
+      await AsyncStorage.removeItem('favorites');  // Xóa tất cả dữ liệu yêu thích trong AsyncStorage
+      setFavorites([]);  // Cập nhật lại state để giao diện hiển thị danh sách yêu thích trống
+    } catch (error) {
+      console.error('Error clearing favorites:', error);
+    }
+  };
+
+  // Hàm để quay lại trang trước và xóa tất cả yêu thích
+  const handleGoBack = () => {
+    handleClearFavorites();  // Clear favorites
+    navigation.goBack();  // Quay lại trang trước
+  };
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={{flexDirection:'row', marginTop:20, marginLeft:20}}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <AntDesign name="left" size={25} color="black" />
-          </TouchableOpacity>
-          <Text style={{fontSize:20, fontWeight:'bold', marginLeft:100}}>Favorites</Text>
-        </View>
+      {/* Nút quay lại trang trước */}
+      <TouchableOpacity onPress={handleGoBack}>
+        <AntDesign name="left" size={30} color="black" />
+      </TouchableOpacity>
 
-        <Text style={{fontSize:25, fontWeight:'bold', marginLeft:20, marginTop:20}}>Places you liked</Text>
-
-        {/* Show list of favorites here */}
-       
+      <ScrollView>
+        <Text style={styles.header}>Your Favorites</Text>
+        {favorites.length > 0 ? (
+          favorites.map((item, index) => (
+            <View key={index} style={styles.card}>
+              <Image source={item.imageSource} style={styles.image} />
+              <Text style={styles.title}>{item.title}</Text>
+              <Text>Rating: {item.rating}</Text>
+              <Text>Location: {item.location}</Text>
+              <Text>Price: ${item.price}/night</Text>        
+            </View>
+          ))
+        ) : (
+          <Text style={styles.emptyText}>No favorites yet!</Text>
+        )}
       </ScrollView>
-
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate('Search_SelectADestination')}>
-          <FontAwesome5 name="search" size={24} color="black" style={{ marginLeft: 10 }} />
-          <Text>Search</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Favorite')}>
-          <View>
-            <MaterialIcons name="favorite-border" size={24} color="blue" style={{ marginLeft: 10 }} />
-            <Text  style={{color:'blue'}}>Favorite</Text>
-          </View>
-        </TouchableOpacity>
-        <View>
-          <MaterialIcons name="dashboard" size={24} color="black" style={{ marginLeft: 10 }} />
-          <Text>Bookings</Text>
-        </View>
-        <View>
-          <Ionicons name="chatbox-ellipses-outline" size={24} color="black" style={{ marginLeft: 5 }} />
-          <Text>Inbox</Text>
-        </View>
-        <View>
-          <FontAwesome5 name="user-circle" size={24} color="black" style={{ marginLeft: 5 }} />
-          <Text>Profile</Text>
-        </View>
-      </View>
     </View>
   );
 };
 
-export default Favorite;
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Makes sure the container takes up the full screen
+    flex: 1,
+    padding: 20,
   },
-  scrollViewContent: {
-    paddingBottom: 100, // Adds extra space at the bottom to prevent footer from covering content
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   card: {
     marginBottom: 20,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#D3D3D3',
+    borderColor: '#ccc',
     borderRadius: 8,
   },
   image: {
@@ -97,17 +104,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 50,
   },
-  footer: {
-    position: 'absolute', // Fixes footer at the bottom of the screen
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    padding: 10,
-    borderTopWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+  removeText: {
+    color: 'red',
+    marginTop: 10,
   },
 });
+
+export default Favorite;

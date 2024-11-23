@@ -15,26 +15,30 @@ import HouseDetails from './components/HouseDetails';
 import HouseDetails_All from './components/HouseDetails_All';
 import HouseDetails_Des from './components/HouseDetails_Des';
 import HouseDetails_Fac from './components/HouseDetails_Fac';
+import Checkout from './components/Checkout';
 import Favorite from './components/Favorite';
+import PaymentSuccess from './components/PaymentSuccess';
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
    
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SignUp" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="LaunchScreen" component={LaunchScreen} />
+      <Stack.Navigator initialRouteName="PaymentSuccess" screenOptions={{ headerShown: false }}>
+        {/* <Stack.Screen name="LaunchScreen" component={LaunchScreen} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Home" component={Home} />
-       <Stack.Screen name="Search_SelectADestination" component={Search_SelectADestination} />
+        <Stack.Screen name="Search_SelectADestination" component={Search_SelectADestination} />
         <Stack.Screen name="Search_SelectTimeRange" component={Search_SelectTimeRange} /> 
         <Stack.Screen name="Search_AddGuests" component={Search_AddGuests} />
-        <Stack.Screen name="SearchResults" component={SearchResults} />
-        <Stack.Screen name="HouseDetails" component={HouseDetails} />
         <Stack.Screen name="HouseDetails_All" component={HouseDetails_All}/>
         <Stack.Screen name="HouseDetails_Des" component={HouseDetails_Des} />
         <Stack.Screen name="HouseDetails_Fac" component={HouseDetails_Fac} />
+        <Stack.Screen name="SearchResults" component={SearchResults} />
         <Stack.Screen name="Favorite" component={Favorite} />
+        <Stack.Screen name="HouseDetails" component={HouseDetails} />
+        <Stack.Screen name="Checkout" component={Checkout} /> */}
+        <Stack.Screen name="PaymentSuccess" component={PaymentSuccess} />
       </Stack.Navigator>
     </NavigationContainer>
 

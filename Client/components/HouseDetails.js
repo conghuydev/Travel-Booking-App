@@ -220,7 +220,7 @@ const HouseDetails = ({ route }) => {
           <Text style={styles.fromText}>From:</Text>
           <Text style={styles.priceText}>$20 /night</Text>
         </View>
-        <TouchableOpacity style={styles.bookButton}>
+        <TouchableOpacity style={styles.bookButton} onPress={() => navigation.navigate('Checkout') }>
           <Text style={styles.bookButtonText}>Book now</Text>
         </TouchableOpacity>
       </View>

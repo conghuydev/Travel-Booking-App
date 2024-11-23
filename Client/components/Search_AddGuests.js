@@ -56,7 +56,7 @@ const Search_AddGuests = () => {
         size={24}
         color="black"
         style={{ marginTop: 30, textAlign: 'right', marginRight: 45 }}
-        onPress={() => navigation.navigate('Search_SelectTimeRange', { selectedLocation })}
+        onPress={() => navigation.navigate('Search_SelectTimeRange')}
       />
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Location</Text>

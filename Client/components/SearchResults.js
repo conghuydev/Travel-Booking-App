@@ -8,6 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Modal } from 'react-native';
 // Add a formatDate function or use a library like moment.js or date-fns
 const formatDate = (date) => {
   if (date) {
@@ -26,7 +27,40 @@ const SearchResults = () => {
 
   const [checked, setChecked] = useState(false);
   const [favorites, setFavorites] = useState([]);
-  const toggleCheckbox = () => setChecked(!checked);
+  const toggleCheckbox = () => {
+    setChecked(!checked);
+    if (!checked) {
+
+    }
+  };
+  const [modalVisible, setModalVisible] = useState(false);
+  const saveFavorite = async (favorite) => {
+    try {
+      const existingFavorites = await AsyncStorage.getItem('favorites');
+      const favoritesList = existingFavorites ? JSON.parse(existingFavorites) : [];
+  
+      // Kiểm tra trùng lặp
+      const isDuplicate = favoritesList.some(
+        (item) => item.title === favorite.title && item.location === favorite.location
+      );
+  
+      if (!isDuplicate) {
+        favoritesList.push(favorite);
+        await AsyncStorage.setItem('favorites', JSON.stringify(favoritesList));
+        alert('Added to favorites!');
+      } else {
+        alert('This item is already in your favorites!');
+      }
+    } catch (error) {
+      console.error('Error saving favorite:', error);
+    }
+  };
+
+  // Modal close handler
+  const handleCloseModal = () => {
+    setModalVisible(false);  // Close the modal
+  };
+  
   
   
   return (
@@ -46,6 +80,7 @@ const SearchResults = () => {
             </ScrollView>
           </View>
         </View>
+        <View>
         <TouchableOpacity>
         <Image
           resizeMode="contain"
@@ -53,24 +88,40 @@ const SearchResults = () => {
           style={styles.preferencesIcon}
         />
         </TouchableOpacity>
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}  // Điều khiển việc hiển thị modal
+        onRequestClose={handleCloseModal} // Đóng modal khi nhấn phím quay lại trên Android
+      >
+        <View style={styles.customModalOverlay}>
+          <View style={styles.customModalContainer}>
+            <Text style={styles.customModalText}>You have checked the box!</Text>
+            <TouchableOpacity style={styles.customButton} onPress={handleCloseModal}>
+              <Text style={styles.customButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+        </View>
       </View>
 
       <View style={styles.line}></View>
 
       <View style={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Present total price</Text>
-          <View style={styles.detailsContainer}>
-            <Text style={styles.description}>All-inclusive, pre-tax</Text>
-            <View style={styles.checkboxContainer}>
-              <Checkbox
-                status={checked ? 'checked' : 'unchecked'}
-                onPress={toggleCheckbox}
-              />
-            </View>
+      <View style={styles.card}>
+        <Text style={styles.title}>Present total price</Text>
+        <View style={styles.detailsContainer}>
+          <Text style={styles.description}>All-inclusive, pre-tax</Text>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              status={checked ? 'checked' : 'unchecked'}
+              onPress={toggleCheckbox} 
+            />
           </View>
         </View>
       </View>
+    </View>
 
       {/* Example Content */}
       <TouchableOpacity 
@@ -274,5 +325,33 @@ const styles = StyleSheet.create({
     top: 30,                
     right: 30,              
                 
+  },
+ customModalOverlay: {
+    flex: 1,
+    justifyContent: 'center',  // Center content vertically
+    alignItems: 'center',      // Center content horizontally
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker overlay
+  },
+  customModalContainer: {
+    width: '100%',  // This makes the modal take up the full width of the screen
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    elevation: 5, // Optional shadow for Android
+    alignItems: 'center',  // Center content inside the modal horizontally
+  },
+  customModalText: {
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 20,
+  },
+  customButton: {
+    backgroundColor: '#FF5733', // Button color
+    padding: 12,
+    borderRadius: 8,
+  },
+  customButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
